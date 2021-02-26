@@ -8,10 +8,17 @@ const Day = {
   'SUN': 0,
 };
 
+const StudyDate = {
+  START: '2021-02-09',
+  END: '2021-06-14',
+};
+
+const WEEK_TIME = 1000 * 60 * 60 * 24 * 7;
+
 const addZero = (number: string): string => number.length === 1 ? '0' + number : number;
 
-export const getTimeOfCurrentMonday = (): number => {
-  const dateInstance = new Date();
+export const getTimeOfTheClosestMonday = (time: number): number => {
+  const dateInstance = new Date(time);
 
   dateInstance.setDate(dateInstance.getDate() - (dateInstance.getDay() - Day.MON) % 7);
 
@@ -19,6 +26,8 @@ export const getTimeOfCurrentMonday = (): number => {
 
   return dateInstance.getTime();
 };
+
+export const getTimeOfCurrentMonday = (): number => getTimeOfTheClosestMonday(Date.now());
 
 export const formatDate = (time: number): string => {
   const dateInstance = new Date(time);
@@ -42,13 +51,29 @@ const convertFormattedDateToTime = (formattedDate: string): number => {
   return new Date(year, month, date).getTime();
 };
 
-export const getStudyWeek = () => {
-  const WEEK_TIME = 1000 * 60 * 60 * 24 * 7;
-
-  const studyingStartTime = convertFormattedDateToTime('2021-02-08');
+// todo: refactor (54-71)
+export const getStudyWeek = (): number => {
+  const studyingStartTime = getTimeOfTheClosestMonday(convertFormattedDateToTime(StudyDate.START));
   const currentWeekStartTime = getTimeOfCurrentMonday();
 
   const elapsedWeeksNumber = (currentWeekStartTime - studyingStartTime) / WEEK_TIME;
 
   return elapsedWeeksNumber + 1;
+};
+
+export const getStudyWeeksCount = (): number => {
+  const studyingStartTime = getTimeOfTheClosestMonday(convertFormattedDateToTime(StudyDate.START));
+  const studyingEndTime = getTimeOfTheClosestMonday(convertFormattedDateToTime(StudyDate.END));
+
+  const elapsedWeeksNumber = (studyingEndTime - studyingStartTime) / WEEK_TIME;
+
+  return elapsedWeeksNumber + 1;
+};
+
+export const getMondayDatesArray = () => {
+  const studyWeeksCount = getStudyWeeksCount();
+  const startTime = convertFormattedDateToTime(StudyDate.START);
+  const array = new Array(studyWeeksCount).fill(startTime);
+
+  return array.map((it, index) => formatDate(new Date(startTime + index * WEEK_TIME).getTime()))
 };
