@@ -12,7 +12,6 @@ import { Selector } from './utils/scraper.js';
 
 import { Time } from './constants/schedule.js';
 
-// const DATE = formatDate(getTimeOfCurrentMonday());
 const GroupCode = {
   'IST-922': '54214',
 };
@@ -74,82 +73,9 @@ const createWeekScheduleItem = (week: number): IWeekSchedule => ({
   ]
 });
 
-(async () => {
+const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSchedule) => {
   try {
-    let i = 0;
-
-    const ClassSchedule: ScheduleType = [];
-
-    for (const date of getMondayDatesArray()) {
-      i++;
-
-      const url = getURL(GroupCode['IST-922'], date);
-      const pageContent = await getPageContent(url);
-
-      const $ = cheerio.load(pageContent);
-      const $scheduleDays = $(Selector.SCHEDULE_DAY);
-
-      const weekScheduleItem = createWeekScheduleItem(i);
-
-      $scheduleDays.each((i, cheerioElement) => {
-        const element = $(cheerioElement);
-
-        if (!element.is(':empty')) {
-          const scheduleItem: IScheduleItem = {
-            subject: getTrimmedTextOfElement(element.find(Selector.SUBJECT)),
-            teacher: getTrimmedTextOfElement(element.find(Selector.TEACHER)),
-            type: getTrimmedTextOfElement(element.find(Selector.CLASS_FORM)),
-            classroom: getTrimmedTextOfElement(element.find(Selector.CLASSROOM)),
-            time: Time[Math.floor(i / 6)],
-          };
-
-          weekScheduleItem.days[i % 6].lessons.push(scheduleItem);
-        }
-      });
-
-      ClassSchedule.push(weekScheduleItem);
-
-      for (const weekSchedule of ClassSchedule) {
-        await saver.saveWeekSchedule(weekSchedule);
-      }
-    }
-
-    /*
-
-    const url = getURL(GroupCode['IST-922'], DATE);
     const pageContent = await getPageContent(url);
-
-    const ClassSchedule: ScheduleType = [
-      {
-        week: currentStudyWeek,
-        days: [
-          {
-            day: 'Понедельник',
-            lessons: []
-          },
-          {
-            day: 'Вторник',
-            lessons: []
-          },
-          {
-            day: 'Среда',
-            lessons: []
-          },
-          {
-            day: 'Четверг',
-            lessons: []
-          },
-          {
-            day: 'Пятница',
-            lessons: []
-          },
-          {
-            day: 'Суббота',
-            lessons: []
-          },
-        ]
-      },
-    ];
 
     const $ = cheerio.load(pageContent);
     const $scheduleDays = $(Selector.SCHEDULE_DAY);
@@ -166,20 +92,32 @@ const createWeekScheduleItem = (week: number): IWeekSchedule => ({
           time: Time[Math.floor(i / 6)],
         };
 
-        const weekItem = ClassSchedule.find(item => item.week === currentStudyWeek);
-
-        weekItem!.days[i % 6].lessons.push(scheduleItem); // maybe bad cuz may not find a week and weekTime will be undefined
+        weekScheduleItem.days[i % 6].lessons.push(scheduleItem);
       }
     });
-
-    for (const weekSchedule of ClassSchedule) {
-      await saver.saveWeekSchedule(weekSchedule);
-    }*/
-
-    // ClassSchedule.forEach(it => it.days.forEach(it => console.log(it)));
   } catch (err) {
     console.log(chalk.red('Произошла ошибка!'));
     console.log(err);
   }
+};
+
+(async () => {
+  let i = 0;
+  const ClassSchedule: ScheduleType = [];
+
+  for (const date of getMondayDatesArray()) {
+    i++;
+
+    const url = getURL(GroupCode['IST-922'], date);
+    const weekScheduleItem = createWeekScheduleItem(i);
+
+    await getWeekScheduleData(url, weekScheduleItem);
+
+    ClassSchedule.push(weekScheduleItem);
+
+    await saver.saveWeekSchedule(weekScheduleItem);
+  }
+
+  // ClassSchedule.forEach(it => it.days.forEach(it => console.log(it)));
 })();
 
