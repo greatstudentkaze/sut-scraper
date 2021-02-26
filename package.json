@@ -17,12 +17,14 @@
     "@babel/core": "^7.13.1",
     "@babel/node": "^7.13.0",
     "@babel/preset-env": "^7.13.5",
+    "async": "^3.2.0",
     "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.5",
     "puppeteer": "^7.1.0",
     "transliteration": "^2.2.0"
   },
   "devDependencies": {
+    "@types/async": "^3.2.5",
     "@types/cheerio": "^0.22.24",
     "@types/node": "^14.14.31",
     "nodemon": "^2.0.7",
