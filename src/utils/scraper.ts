@@ -1,11 +1,11 @@
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 
-import { puppeteerHandler } from '../index';
+import { puppeteerHandler } from '../index.js';
 
-import { getTrimmedTextOfElement } from './cheerio';
+import { getTrimmedTextOfElement } from './cheerio.js';
 
-import { Time } from '../constants/schedule';
+import { Time } from '../constants/schedule.js';
 import { IScheduleItem, IWeekSchedule } from '../interfaces';
 
 const Selector = {
