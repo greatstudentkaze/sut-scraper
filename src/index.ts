@@ -115,39 +115,6 @@ const saver = new Saver('data');
     }
 
     // ClassSchedule.forEach(it => it.days.forEach(it => console.log(it)));
-
-
-    /*for (const page of arrayFromLength(1)) {
-      const url = `${URL}${date}`;
-      const pageContent = await getPageContent(url);
-      // console.log(pageContent);
-
-      const $ = cheerio.load(pageContent);
-      const scheduleItems = [];
-
-      $('.rasp-day').each((i, header) => {
-        // const url = $(header).attr('href');
-        // const title = $(header).text();
-        const teacher = $(header).find('.teacher').text().trim();
-        const subject = $(header).find('.vt240').text().trim();
-        const text = $(header).text();
-
-        console.log(text);
-        scheduleItems.push({ teacher, subject, code: slugify(subject) });
-      });
-
-      // console.log(scheduleItems);
-
-      // await listItemsHandler(scheduleItems);
-
-      for (const { subject, teacher, code } of scheduleItems) {
-        if (!subject || !teacher || !code) {
-          continue;
-        }
-        await saveData({ subject, teacher, code });
-      }
-
-    }*/
   } catch (err) {
     console.log(chalk.red('Произошла ошибка!'));
     console.log(err);
