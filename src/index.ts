@@ -3,8 +3,8 @@ import chalk from 'chalk';
 
 import Saver from './handlers/saver.js';
 
-import { getPageContent } from './utils/puppeteer.js';
-
+import PuppeteerHandler from './handlers/puppeteer.js';
+import taskQueue from './utils/taskQueue.js';
 import { getMondayDatesArray } from './utils/date.js';
 import { getURL } from './utils/url.js';
 import { getTrimmedTextOfElement } from './utils/cheerio.js';
@@ -15,6 +15,8 @@ import { Time } from './constants/schedule.js';
 const GroupCode = {
   'IST-922': '54214',
 };
+
+export const puppeteerHandler = new PuppeteerHandler();
 
 interface IScheduleItem {
   subject: string,
@@ -75,7 +77,7 @@ const createWeekScheduleItem = (week: number): IWeekSchedule => ({
 
 const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSchedule) => {
   try {
-    const pageContent = await getPageContent(url);
+    const pageContent = await puppeteerHandler.getPageContent(url);
 
     const $ = cheerio.load(pageContent);
     const $scheduleDays = $(Selector.SCHEDULE_DAY);
@@ -101,23 +103,32 @@ const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSchedule)
   }
 };
 
-(async () => {
-  let i = 0;
+const main = () => {
   const ClassSchedule: ScheduleType = [];
 
-  for (const date of getMondayDatesArray()) {
-    i++;
+  getMondayDatesArray().forEach((date, index) => {
+    taskQueue.push(
+      async () => {
+        const url = getURL(GroupCode['IST-922'], date);
+        const weekScheduleItem = createWeekScheduleItem(index);
 
-    const url = getURL(GroupCode['IST-922'], date);
-    const weekScheduleItem = createWeekScheduleItem(i);
+        await getWeekScheduleData(url, weekScheduleItem);
 
-    await getWeekScheduleData(url, weekScheduleItem);
+        ClassSchedule.push(weekScheduleItem);
 
-    ClassSchedule.push(weekScheduleItem);
+        await saver.saveWeekSchedule(weekScheduleItem);
+      },
+      err => {
+        if (err) {
+          throw new Error(`Ошибка при получении данных со страницы ${index} недели\n`);
+        }
 
-    await saver.saveWeekSchedule(weekScheduleItem);
-  }
+        console.log(chalk.green.bold(`Завершено получение данных со страницы ${index} недели\n`));
+      }
+    );
+  });
+};
 
-  // ClassSchedule.forEach(it => it.days.forEach(it => console.log(it)));
-})();
+puppeteerHandler.initBrowser()
+  .then(main);
 
