@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 
-import { IWeekSchedule } from '../index.js';
+import { IWeekSchedule } from '../interfaces';
 
 class Saver {
   private readonly dirname: string;
