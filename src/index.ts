@@ -4,7 +4,7 @@ import PuppeteerHandler from './handlers/puppeteer.js';
 import Saver from './handlers/saver.js';
 
 import taskQueue from './utils/taskQueue.js';
-import { createWeekScheduleItem } from './utils/common';
+import { createWeekScheduleItem } from './utils/common.js';
 import { getMondayDatesArray } from './utils/date.js';
 import { getURL, getWeekScheduleData, GroupCode } from './utils/scraper.js';
 
@@ -15,9 +15,11 @@ export const puppeteerHandler = new PuppeteerHandler();
 
 const saver = new Saver('data');
 
-const main = () => {
-  const ClassSchedule: ScheduleType = [];
+const ClassSchedule: ScheduleType = [];
 
+export const onTaskQueueDrain = () => saver.saveSemesterSchedule(ClassSchedule);
+
+const main = () => {
   getMondayDatesArray().forEach((date, index) => {
     taskQueue.push(
       async () => {
@@ -27,15 +29,13 @@ const main = () => {
         await getWeekScheduleData(url, weekScheduleItem);
 
         ClassSchedule.push(weekScheduleItem);
-
-        await saver.saveWeekSchedule(weekScheduleItem);
       },
       err => {
         if (err) {
-          throw new Error(`Ошибка при получении данных со страницы ${index} недели\n`);
+          throw new Error(`Ошибка при получении данных со страницы ${index + 1} недели\n`);
         }
 
-        console.log(chalk.green.bold(`Завершено получение данных со страницы ${index} недели\n`));
+        console.log(chalk.green.bold(`Завершено получение данных со страницы ${index + 1} недели\n`));
       }
     );
   });

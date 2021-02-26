@@ -3,6 +3,7 @@ import fs from 'fs';
 import chalk from 'chalk';
 
 import { IWeekSchedule } from '../interfaces';
+import { ScheduleType } from '../types';
 
 class Saver {
   private readonly dirname: string;
@@ -15,14 +16,11 @@ class Saver {
     this.saveDirPath = path.join(this.dirname, this.saveDir)
   }
 
-  public async saveWeekSchedule(data: IWeekSchedule) {
-    const { week, days } = data;
-
-    const fileName = `schedule-week${week}.json`;
+  private async saveData(data: any, fileName: string) {
     const savePath = path.join(this.saveDirPath, fileName);
 
     return new Promise(((resolve, reject) => {
-      fs.writeFile(savePath, JSON.stringify(days), err => {
+      fs.writeFile(savePath, JSON.stringify(data, null, 2), err => {
         if (err) {
           return reject(err);
         }
@@ -31,6 +29,20 @@ class Saver {
         resolve(true);
       })
     }));
+  }
+
+  public async saveWeekSchedule(data: IWeekSchedule) {
+    const { week, days } = data;
+
+    const fileName = `schedule-week${week}.json`;
+
+    await this.saveData(days, fileName);
+  }
+
+  public async saveSemesterSchedule(data: ScheduleType) {
+    const fileName = 'schedule-semester.json';
+
+    await this.saveData(data, fileName);
   }
 
   public clearSaveDirectory() {
