@@ -24,7 +24,7 @@ const main = () => {
     taskQueue.push(
       async () => {
         const url = getURL(GroupCode['IST-922'], date);
-        const weekScheduleItem = createWeekScheduleItem(index);
+        const weekScheduleItem = createWeekScheduleItem(index + 1);
 
         await getWeekScheduleData(url, weekScheduleItem);
 
