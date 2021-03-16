@@ -1,5 +1,6 @@
 import cheerio from 'cheerio';
 import chalk from 'chalk';
+import { nanoid } from 'nanoid';
 
 import { puppeteerHandler } from '../index.js';
 
@@ -10,6 +11,7 @@ import { IScheduleItem, IWeekSchedule } from '../interfaces';
 
 const Selector = {
   'SCHEDULE_DAY': '.rasp-day',
+  'DATE': '.vt237[data-i]',
   'SUBJECT': '.vt240',
   'TEACHER': '.vt241',
   'CLASSROOM': '.vt242',
@@ -32,6 +34,16 @@ export const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSc
 
     const $ = cheerio.load(pageContent);
     const $scheduleDays = $(Selector.SCHEDULE_DAY);
+    const $dateElements = $(Selector.DATE);
+
+    $dateElements.each((i, cheerioElement) => {
+      const element = $(cheerioElement);
+
+      if (!element.is(':empty')) {
+        const date = element.children().remove().end().text().trim();
+        weekScheduleItem.days[i % 6].date = date;
+      }
+    });
 
     $scheduleDays.each((i, cheerioElement) => {
       const element = $(cheerioElement);
@@ -43,6 +55,7 @@ export const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSc
           type: getTrimmedTextOfElement(element.find(Selector.CLASS_FORM)),
           classroom: getTrimmedTextOfElement(element.find(Selector.CLASSROOM)),
           time: Time[Math.floor(i / 6)],
+          id: nanoid(),
         };
 
         weekScheduleItem.days[i % 6].lessons.push(scheduleItem);
