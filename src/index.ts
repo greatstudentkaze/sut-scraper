@@ -15,9 +15,14 @@ export const puppeteerHandler = new PuppeteerHandler();
 
 const saver = new Saver('data');
 
-const ClassSchedule: ScheduleType = [];
+const classSchedule: ScheduleType = [];
 
-export const onTaskQueueDrain = () => saver.saveSemesterSchedule(ClassSchedule);
+export const onTaskQueueDrain = async () => {
+  const formattedData = saver.formatScheduleForGoogleCalendar(classSchedule);
+
+  await saver.saveSemesterSchedule(classSchedule);
+  await saver.saveFormattedSchedule(formattedData);
+}
 
 const main = () => {
   getMondayDatesArray().forEach((date, index) => {
@@ -28,7 +33,7 @@ const main = () => {
 
         await getWeekScheduleData(url, weekScheduleItem);
 
-        ClassSchedule.push(weekScheduleItem);
+        classSchedule.push(weekScheduleItem);
       },
       err => {
         if (err) {

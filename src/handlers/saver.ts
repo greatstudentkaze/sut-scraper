@@ -2,8 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import chalk from 'chalk';
 
+import { getLessonsForTheWeeks } from '../utils/saver.js';
+
 import { IWeekSchedule } from '../interfaces';
-import { ScheduleType } from '../types';
+import { GoogleCalendarScheduleType, ScheduleType } from '../types';
 
 class Saver {
   private readonly dirname: string;
@@ -43,6 +45,35 @@ class Saver {
     const fileName = 'schedule-semester.json';
 
     await this.saveData(data, fileName);
+  }
+
+  public async saveFormattedSchedule(data: GoogleCalendarScheduleType) {
+    const fileName = 'schedule.csv';
+    const savePath = path.join(this.saveDirPath, fileName);
+
+    const csvRows = data.map(row => {
+      const values = Object.values(row);
+
+      return values.map(value => value.replace(/(.+)/, `"$1"`));
+    });
+
+    csvRows.unshift(Object.keys(data[0]));
+    const csv = csvRows.join('\n');
+
+    return new Promise(((resolve, reject) => {
+      fs.writeFile(savePath, csv, err => {
+        if (err) {
+          return reject(err);
+        }
+
+        Saver.successfulSave(fileName);
+        resolve(true);
+      })
+    }));
+  }
+
+  public formatScheduleForGoogleCalendar(data: ScheduleType): GoogleCalendarScheduleType {
+    return getLessonsForTheWeeks(data);
   }
 
   public clearSaveDirectory() {

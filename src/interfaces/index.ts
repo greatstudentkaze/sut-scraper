@@ -24,3 +24,12 @@ export interface IWeekSchedule {
   week: number,
   days: IDaySchedule[],
 }
+
+export interface IGoogleCalendarItem {
+  'Subject': string,
+  'Start Date': string,
+  'Start Time': string,
+  'End Date': string,
+  'End Time': string,
+  'Description': string,
+}
