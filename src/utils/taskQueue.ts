@@ -22,8 +22,6 @@ taskQueue.drain(async () => {
   await puppeteerHandler.closeBrowser();
 
   await onTaskQueueDrain();
-
-  process.exit();
 });
 
 export default taskQueue;
