@@ -1,47 +1,38 @@
-import { nanoid } from 'nanoid';
-
 import { IWeekSchedule } from '../interfaces';
 
 // todo: add dayCreator
 export const createWeekScheduleItem = (week: number): IWeekSchedule => ({
-  id: nanoid(),
   week: week,
   days: [
     {
-      id: nanoid(),
       date: '',
       day: 'Понедельник',
-      lessons: []
+      classes: []
     },
     {
-      id: nanoid(),
       date: '',
       day: 'Вторник',
-      lessons: []
+      classes: []
     },
     {
-      id: nanoid(),
       date: '',
       day: 'Среда',
-      lessons: []
+      classes: []
     },
     {
-      id: nanoid(),
       date: '',
       day: 'Четверг',
-      lessons: []
+      classes: []
     },
     {
-      id: nanoid(),
       date: '',
       day: 'Пятница',
-      lessons: []
+      classes: []
     },
     {
-      id: nanoid(),
       date: '',
       day: 'Суббота',
-      lessons: []
+      classes: []
     },
   ]
 });

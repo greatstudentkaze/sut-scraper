@@ -1,13 +1,12 @@
 import cheerio from 'cheerio';
 import chalk from 'chalk';
-import { nanoid } from 'nanoid';
 
 import { puppeteerHandler } from '../index.js';
 
 import { getTrimmedTextOfElement } from './cheerio.js';
 
 import { Time } from '../constants/schedule.js';
-import { IScheduleItem, IWeekSchedule } from '../interfaces';
+import { IClass, IWeekSchedule } from '../interfaces';
 
 const Selector = {
   'SCHEDULE_DAY': '.rasp-day',
@@ -18,7 +17,11 @@ const Selector = {
   'CLASS_FORM': '.vt243',
 };
 
-export const GroupCode = {
+type GroupCodeType = {
+  [key: string]: string
+};
+
+export const GroupCode: GroupCodeType = {
   'IST-922': '54214',
 };
 
@@ -49,16 +52,15 @@ export const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSc
       const element = $(cheerioElement);
 
       if (!element.is(':empty')) {
-        const scheduleItem: IScheduleItem = {
+        const scheduleItem: IClass = {
           subject: getTrimmedTextOfElement(element.find(Selector.SUBJECT)),
           teacher: getTrimmedTextOfElement(element.find(Selector.TEACHER)),
           type: getTrimmedTextOfElement(element.find(Selector.CLASS_FORM)),
           classroom: getTrimmedTextOfElement(element.find(Selector.CLASSROOM)),
           time: Time[Math.floor(i / 6)],
-          id: nanoid(),
         };
 
-        weekScheduleItem.days[i % 6].lessons.push(scheduleItem);
+        weekScheduleItem.days[i % 6].classes.push(scheduleItem);
       }
     });
   } catch (err) {

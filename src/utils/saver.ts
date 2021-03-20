@@ -1,5 +1,5 @@
 import DateTimeFormatOptions = Intl.DateTimeFormatOptions;
-import { IDaySchedule, IScheduleItem, IWeekSchedule } from '../interfaces';
+import { IDaySchedule, IClass, IWeekSchedule } from '../interfaces';
 import { GoogleCalendarScheduleType } from '../types';
 
 const timeOptions: DateTimeFormatOptions = {
@@ -22,7 +22,7 @@ const formatDate = (date: string): string => {
   return dateItems.join('/');
 };
 
-export const getLessonsForTheDay = (lessonItems: IScheduleItem[], date: string): GoogleCalendarScheduleType =>
+export const getLessonsForTheDay = (lessonItems: IClass[], date: string): GoogleCalendarScheduleType =>
   lessonItems.reduce((lessons: GoogleCalendarScheduleType, item) => {
     const { subject, time, type } = item;
 
@@ -47,14 +47,14 @@ export const getLessonsForTheDay = (lessonItems: IScheduleItem[], date: string):
   }, []);
 
 export const getLessonsForTheWeek = (dayItems: IDaySchedule[]): GoogleCalendarScheduleType =>
-  dayItems.reduce((dayLessons: GoogleCalendarScheduleType, { lessons, date }) => {
+  dayItems.reduce((dayLessons: GoogleCalendarScheduleType, { classes, date }) => {
 
-    if (lessons.length) {
+    if (classes.length) {
       date = formatDate(date);
 
       return [
         ...dayLessons,
-        ...getLessonsForTheDay(lessons, date)
+        ...getLessonsForTheDay(classes, date)
       ]
     }
 

@@ -1,7 +1,6 @@
 import { DayOfTheWeekType } from '../types';
 
-export interface IScheduleItem {
-  id: string,
+export interface IClass {
   subject: string,
   teacher: string,
   type: string,
@@ -13,14 +12,12 @@ export interface IScheduleItem {
 }
 
 export interface IDaySchedule {
-  id: string,
   day: DayOfTheWeekType,
   date: string,
-  lessons: IScheduleItem[],
+  classes: IClass[],
 }
 
 export interface IWeekSchedule {
-  id: string,
   week: number,
   days: IDaySchedule[],
 }
