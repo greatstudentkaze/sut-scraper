@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import apicache from 'apicache';
 import chalk from 'chalk';
 import dotenv from 'dotenv';
 
@@ -55,7 +56,7 @@ export const scrapeSchedule = (group: string) => {
 };
 
 const app = express();
-
+app.use(apicache.middleware('5 minutes'));
 app.use(express.json());
 app.use('/', router);
 
