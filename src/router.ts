@@ -4,8 +4,8 @@ import ScheduleController from './controller/schedule.js';
 
 const router = Router();
 
-router.post('/schedule', ScheduleController.create);
-router.get('/schedule', ScheduleController.get);
-router.put('/schedule', ScheduleController.update);
+router.post('/schedules/:group', ScheduleController.create);
+router.get('/schedules/:group', ScheduleController.get);
+router.put('/schedules/:group', ScheduleController.update);
 
 export default router;

@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 import ScheduleModel from '../model/schedule.js';
 
 import { classSchedule, puppeteerHandler, scrapeSchedule } from '../index.js';
@@ -10,26 +7,41 @@ import { IWeekSchedule } from '../interfaces';
 
 class ScheduleService {
   async create(group: string) {
-    let classSchedule = [];
-
-    if (group === 'IST-922') {
-      classSchedule = JSON.parse(fs.readFileSync(path.join(path.resolve(), 'data/schedule-semester.json'), 'utf-8').toString());
+    if (group !== 'IST-922') {
+      throw new Error(`We are unable to provide a schedule for ${group} group yet.`);
     }
 
-    const schedule = await ScheduleModel.create({ group, schedule: classSchedule });
+    let scheduleDoc = await ScheduleModel.findOne({ group });
 
-    return schedule;
+    if (!scheduleDoc) {
+      await puppeteerHandler.initBrowser();
+      console.log('\nБраузер инициализирован, начинаю парсить');
+      scrapeSchedule(group);
+      await taskQueue.drain();
+      scheduleDoc = await ScheduleModel.create({ group, schedule: classSchedule });
+    }
+
+    return scheduleDoc.schedule;
   }
 
   async get(group: string) {
-    const { schedule } = await ScheduleModel.findOne({ group });
-    return schedule;
+    const scheduleDoc = await ScheduleModel.findOne({ group });
+
+    if (!scheduleDoc) {
+      throw new Error(`There is no schedule for ${group} group`);
+    }
+
+    return scheduleDoc.schedule;
   }
 
   async getForWeek(group: string, week: number) {
-    const { schedule } = await ScheduleModel.findOne({ group });
+    const schedule = await this.get(group);
 
     const weekSchedule = schedule.find((it: IWeekSchedule) => it.week === week);
+
+    if (!weekSchedule) {
+      throw new Error(`There is no schedule for week ${week}`);
+    }
 
     return weekSchedule.days;
   }
@@ -43,9 +55,9 @@ class ScheduleService {
     console.log('\nБраузер инициализирован, начинаю парсить');
     scrapeSchedule(group);
     await taskQueue.drain();
-    await ScheduleModel.updateOne({ group }, { $set: { schedule: classSchedule }});
+    const { schedule } = await ScheduleModel.findOneAndUpdate({ group }, { $set: { schedule: classSchedule }});
 
-    return `The schedule for ${group} group will be updated in a few minutes.`;
+    return schedule;
   }
 }
 

@@ -5,34 +5,37 @@ import { Request, Response } from 'express';
 class ScheduleController {
   async create(req: Request, res: Response) {
     try {
-      const { group } = req.body;
+      const { group } = req.params;
 
       const schedule = await ScheduleService.create(group);
+
       res.json(schedule);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json(err.message);
     }
   }
 
   async get(req: Request, res: Response) {
     try {
+      const { group } = req.params;
+
       const schedule = req.query.week
-        ? await ScheduleService.getForWeek('IST-922', Number(req.query.week))
-        : await ScheduleService.get('IST-922');
+        ? await ScheduleService.getForWeek(group, Number(req.query.week))
+        : await ScheduleService.get(group);
 
       res.json(schedule);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(500).json(err.message);
     }
   }
 
   async update(req: Request, res: Response) {
     try {
-      const { group } = req.body;
+      const { group } = req.params;
 
-      await ScheduleService.update(group);
+      const schedule = await ScheduleService.update(group);
 
-      res.json(`The schedule for ${group} group will be updated in a few minutes.`);
+      res.json(schedule);
     } catch (err) {
       res.status(500).json(err.message);
     }

@@ -7,6 +7,7 @@ import { getTrimmedTextOfElement } from './cheerio.js';
 
 import { Time } from '../constants/schedule.js';
 import { IClass, IWeekSchedule } from '../interfaces';
+import { GroupCodeType } from '../types';
 
 const Selector = {
   'SCHEDULE_DAY': '.rasp-day',
@@ -15,10 +16,6 @@ const Selector = {
   'TEACHER': '.vt241',
   'CLASSROOM': '.vt242',
   'CLASS_FORM': '.vt243',
-};
-
-type GroupCodeType = {
-  [key: string]: string
 };
 
 export const GroupCode: GroupCodeType = {

@@ -5,3 +5,7 @@ export type DayOfTheWeekType = 'Понедельник' | 'Вторник' | 'С
 export type ScheduleType = IWeekSchedule[];
 
 export type GoogleCalendarScheduleType = IGoogleCalendarItem[];
+
+export type GroupCodeType = {
+  [key: string]: string
+};

@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import apicache from 'apicache';
 import chalk from 'chalk';
-import dotenv from 'dotenv';
+import 'dotenv/config.js';
 
 import PuppeteerHandler from './handlers/puppeteer.js';
 import Saver from './handlers/saver.js';
@@ -15,9 +15,6 @@ import { getURL, getWeekScheduleData, GroupCode } from './utils/scraper.js';
 
 import { ScheduleType } from './types';
 
-dotenv.config();
-
-const PORT = 9000;
 const DB_URL = process.env.DATABASE_URL;
 
 export const puppeteerHandler = new PuppeteerHandler();
@@ -66,8 +63,8 @@ const startApp = async () => {
       throw new Error('Добавь ссылку для подключения к MongoDB Cluster: https://cloud.mongodb.com/v2/6052e4597f4d234d9e630ce2#clusters/connect?clusterId=Cluster0');
     }
 
-    await mongoose.connect(DB_URL, { useUnifiedTopology: true, useNewUrlParser: true });
-    app.listen(PORT,() => console.log(chalk.green(`Server started on port ${PORT}...`)));
+    await mongoose.connect(DB_URL, { useUnifiedTopology: true, useNewUrlParser: true, useFindAndModify: false });
+    app.listen(process.env.PORT,() => console.log(chalk.green(`Server started on port ${process.env.PORT}...`)));
   } catch (err) {
     console.log(chalk.red(err));
   }
