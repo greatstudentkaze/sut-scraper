@@ -1,13 +1,12 @@
 import cheerio from 'cheerio';
 import chalk from 'chalk';
 
-import { puppeteerHandler } from '../index.js';
-
 import { getTrimmedTextOfElement } from './cheerio.js';
 
 import { Time } from '../constants/schedule.js';
 import { IClass, IWeekSchedule } from '../interfaces';
 import { GroupCodeType } from '../types';
+import PuppeteerHandler from '../handlers/puppeteer';
 
 const Selector = {
   'SCHEDULE_DAY': '.rasp-day',
@@ -28,7 +27,7 @@ export const getURL = (groupCode: string, date: string): string => {
   return `${BASE_URL}?group=${groupCode}&date=${date}`;
 };
 
-export const getWeekScheduleData = async (url: string, weekScheduleItem: IWeekSchedule) => {
+export const getWeekScheduleData = async (puppeteerHandler: PuppeteerHandler, url: string, weekScheduleItem: IWeekSchedule) => {
   try {
     const pageContent = await puppeteerHandler.getPageContent(url);
 

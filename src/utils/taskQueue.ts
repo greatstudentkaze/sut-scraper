@@ -1,10 +1,7 @@
 import { queue } from 'async';
 import chalk from 'chalk';
 
-import { onTaskQueueDrain, puppeteerHandler } from '../index.js';
-
 const CONCURRENCY = 10;
-const startTime = Date.now();
 
 const taskQueue = queue(async (task: () => void, done) => {
   try {
@@ -15,13 +12,5 @@ const taskQueue = queue(async (task: () => void, done) => {
     throw err;
   }
 }, CONCURRENCY);
-
-taskQueue.drain(async () => {
-  const endTime = Date.now();
-  console.log(chalk.green.bold(`Все таски выполнены! [${(endTime - startTime) / 1000}s]`));
-  await puppeteerHandler.closeBrowser();
-
-  await onTaskQueueDrain();
-});
 
 export default taskQueue;
